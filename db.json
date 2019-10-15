@@ -56,36 +56,31 @@
                         "timeStamp":"18Q1",
                         "chipDataList": [
                             {
-                                "chipId":1,
-                                "chipName":"AB",
-                                "value": 4.54
-                            },
-                            {
                                 "chipId":2,
                                 "chipName":"BC",
                                 "value": 0.061
                             },
                             {
-                                "chipId":3,
-                                "chipName":"CDE",
-                                "value": 1.13
+                                "chipId":1,
+                                "chipName":"AB",
+                                "value": 4.54
                             },
                             {
                                 "chipId":4,
                                 "chipName":"EFG",
                                 "value": 0.62
+                            },
+                            {
+                                "chipId":3,
+                                "chipName":"CDE",
+                                "value": 1.13
                             }
                         ]
                     },
                     {
                         "stockPrice":16,
                         "timeStamp":"18Q2",
-                        "chipDataList": [
-                            {
-                                "chipId":1,
-                                "chipName":"AB",
-                                "value": 5.39
-                            },
+                        "chipDataList": [    
                             {
                                 "chipId":2,
                                 "chipName":"BC",
@@ -100,6 +95,11 @@
                                 "chipId":4,
                                 "chipName":"EFG",
                                 "value": 0.62
+                            },
+                            {
+                                "chipId":1,
+                                "chipName":"AB",
+                                "value": 5.39
                             }
                         ]
                     },
@@ -113,14 +113,14 @@
                                 "value": 4.4
                             },
                             {
-                                "chipId":2,
-                                "chipName":"BC",
-                                "value": 0.064
-                            },
-                            {
                                 "chipId":3,
                                 "chipName":"CDE",
                                 "value": 1.61
+                            },
+                            {
+                                "chipId":2,
+                                "chipName":"BC",
+                                "value": 0.064
                             },
                             {
                                 "chipId":4,

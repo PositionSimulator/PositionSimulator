@@ -1,10 +1,10 @@
 process.on('message', msg => {
   let simulator = msg.data;
   let { initialPrice, modules } = simulator;
-  modules.forEach(module => {
+  modules.forEach(model => {
     let eachModuleResult = [];
-    let preProcessedObj = dataPreprocessing(module);
-
+    let preProcessedObj = dataPreprocessing(model);
+    console.log(preProcessedObj);
     for (let i = 0; i < preProcessedObj.resultMatrix[0].length; i++) {
       let Calculations = preProcessedObj.content;
 
@@ -15,12 +15,12 @@ process.on('message', msg => {
         );
       });
       eachModuleResult.push(eval(Calculations));
-      // console.log(Calculations);
+
       if(Calculations === true){
         
       }
     }
-    // console.log(eachModuleResult);
+
   });
 });
 
@@ -36,14 +36,18 @@ function dataPreprocessing(unhandledData) {
   });
 
   let valArr = [];
+
   partitionedDataPhases.forEach(element => {
-    element.chipDataList.forEach(each => {
-      valArr.push(each.value);
-    });
+    for(let i = 0; i < element.chipDataList.length; i ++){
+      element.chipDataList.forEach(each => {
+        if(strArr[i] === each.chipName)
+        valArr.push(each.value);
+      });
+    }
     Matrix.push(valArr);
     valArr = [];
   });
-
+  console.log(Matrix);
   let resultMatrix = [];
   for (let j = 0; j < Matrix[0].length; j++) {
     let arr = [];
