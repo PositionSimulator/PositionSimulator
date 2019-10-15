@@ -1,26 +1,43 @@
 process.on('message', msg => {
   let simulator = msg.data;
-  let { initialPrice, modules } = simulator;
+  let { initialPrice, modules, partitionedDataPhases } = simulator;
+  
+  let operation = [], funds = [], fundsWithProfit = [];
+  let stockPriceArr = partitionedDataPhases.map(element => element.stockPrice);
+  let stockPossessed, currentMoney = 0;
+    
   modules.forEach(model => {
-    let eachModuleResult = [];
     let preProcessedObj = dataPreprocessing(model);
-    console.log(preProcessedObj);
-    for (let i = 0; i < preProcessedObj.resultMatrix[0].length; i++) {
-      let Calculations = preProcessedObj.content;
 
+    let currentMoney = initialPrice;
+    let stockPossessed = 0;
+    for (let i = 0; i < preProcessedObj.resultMatrix.length; i++) {
+      let Calculations = preProcessedObj.content;
+      let Oper = [];
       preProcessedObj.strArr.forEach((str, index) => {
-        Calculations = Calculations.replace(
-          str,
+        Calculations = Calculations.replace(str,
           preProcessedObj.resultMatrix[index][i]
         );
       });
-      eachModuleResult.push(eval(Calculations));
+      eval(Calculations);
 
       if(Calculations === true){
-        
+        Oper.push('B');
+        stockPossessed += 1;
+        currentMoney -= stockPriceArr[i] * 1000
+        funds.push(currentMoney);
+        fundsWithProfit.push(currentMoney + (stockPossessed * stockPriceArr[i] * 1000 ))
+      }
+      else{
+        Oper.push('S');
+        stockPossessed += 1;
+        currentMoney += stockPriceArr[i] * 1000
+        funds.push(currentMoney);
+        fundsWithProfit.push(currentMoney + (stockPossessed * stockPriceArr[i] * 1000 ))
       }
     }
-
+    currentMoney = initialPrice;
+    stockPossessed = 0;
   });
 });
 
