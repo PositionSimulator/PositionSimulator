@@ -9,11 +9,6 @@ let childNum = 0;
 Server = http.createServer();
 
 Server.on('request', (req, res) => {
-    if (req.url === '/') {
-        console.log('[ ROUTE ] "/" was been visited... ')
-        res.writeHead(200);
-        res.end(`Hello, I am [ PARENT PROCESS ] server, my process id is: ${process.pid}, my port is 8000\n`);
-    }
     else if (req.url === '/compute') {
         console.log('[ ROUTE ] "/compute" was been visited...\n ')
         // ================================================================================================================
@@ -42,16 +37,6 @@ Server.on('request', (req, res) => {
             res.end(`answer: ${msg.result}`);
         })
         console.log(`[ PARENT PROCESS ] is still running ...\n`);
-    }
-    else if (req.url === '/dog') {
-        console.log('[ ROUTE ] "/dog" was visited... \n')
-        axios.get('https://dog.ceo/api/breeds/image/random')
-            .then((response) => {
-                res.writeHead(200, { 'Content-Type': 'application/json' })
-                res.write(JSON.stringify(response.data));
-                console.log(JSON.stringify(response.data));
-                res.end();
-            })
     }
 })
 

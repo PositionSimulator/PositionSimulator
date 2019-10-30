@@ -1,13 +1,25 @@
-var express = require('express');
-var app = express();
-var child_process = require('child_process');
-var axios = require('axios');
+const express = require('express');
+const app = express();
+const child_process = require('child_process');
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const axios = require("axios");
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
+
+const PORT = 3000
+let childQueue = [];
+let childNum = 0;
+
 app.get('/', (req, res) => {
   res.send('Hello World');
 });
 
 app.get('/compute', (req, res) => {
-  var myPackage = {};
+  const child = child_process.fork('./child.js');
+  
   axios.get('http://localhost:8787/simulator')
   .then((res)=>{
     return res.data;
@@ -21,12 +33,13 @@ app.get('/compute', (req, res) => {
       data: data
     });
   })
-  let child = child_process.fork('./child.js');
+  // const Package = req.body;
+  // console.log(Package);
+  // res.send("hihi parker")
+  // const child = child_process.fork('./child.js');
+  // child.send({ action:'Compute', data: Package })
 
   child.on('message', msg => {
-    console.log(
-      `[ PARENT PROCESS ]: get result = ${msg.result} from [ CHILD PROCESS ] ${msg.id}\n`
-    );
     childNum -= 1;
     console.log(`current number of [ CHILD PROCESS ] is: ${childNum}\n`);
     childQueue.forEach(function(item, index) {
@@ -34,9 +47,15 @@ app.get('/compute', (req, res) => {
         childQueue.splice(index, 1);
       }
     });
+    // console.log(msg.operation)
+    // console.log(msg.possessed)
+    // console.log(msg.funds)
+    // console.log(msg.fundsWithProfit)
+    res.send('hello hello')
   });
+
 });
 
-app.listen(6789, () => {
-  console.log('Server is listening at PORT 3000...');
+app.listen(PORT, () => {
+  console.log(`Server is listening at PORT ${ PORT }...`);
 });
