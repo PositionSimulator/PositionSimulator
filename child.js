@@ -8,9 +8,6 @@ process.on('message', msg => {
   let stockPossessed = 0, currentMoney = initialPrice
   let subStringArr = [], oper = [], poss = [], f_Arr = [], fp_Arr = [], RateCalArr = []
 
-  // let returnModule = {
-  //   modules:[]
-  // }
   modules.forEach(model => {
     let preProcessedModel = dataPreprocessing(model)
 
@@ -26,14 +23,12 @@ process.on('message', msg => {
           preProcessedModel.resultMatrix[j][i]
         )
       }
-      console.log("Calculations: ", Calculations)
       calResult = eval(Calculations);
-      console.log("calResult: ", calResult)
 
       if(calResult == true){
         let currentTemp = currentMoney;
         currentMoney -= stockPriceArr[i] * 1000
-        if(currentMoney<= 0) {
+        if(currentMoney< 0) {
           oper.push('O');
           currentMoney = currentTemp
         }
@@ -81,7 +76,6 @@ process.on('message', msg => {
     }
   })
   
-  
   for(let i = 0; i < operation[0].length; i++){
     let resultOp = 0;
     for(let j = 0; j < operation.length; j++){
@@ -98,7 +92,7 @@ process.on('message', msg => {
     if(resultOp > 0){
       let currentTemp = currentMoney;
       currentMoney -= stockPriceArr[i] * 1000
-      if(currentMoney <= 0) {
+      if(currentMoney < 0) {
         oper.push('O');
         currentMoney = currentTemp
       }
@@ -134,16 +128,21 @@ process.on('message', msg => {
   possessed.push(poss)
   funds.push(f_Arr)
   fundsWithProfit.push(fp_Arr)
-  
-  console.log("operation: ", operation)
-  console.log("possessed: ", possessed)
-  console.log("funds: ", funds)
-  console.log("fundsWithProfit: ", fundsWithProfit)
 
-  // for(let i = 0; i < modules; i++){
-  //   Object.assign({}, { id: modules[i].id }, operation[i], possessed[i], funds[i], fundsWithProfit[i])
-  // }
-  process.send('send')
+  let returnModules = { modules:[] }
+  let Id = 0;
+  for(let i = 0; i < operation.length; i++){
+    if(i === operation.length - 1) Id = 'mix'
+    else Id =  modules[i].moduleId 
+    returnModules.modules[i] = Object.assign({}, {
+      id: Id, 
+      operation:operation[i], 
+      possessed: possessed[i], 
+      funds: funds[i], 
+      fundsWithProfit: fundsWithProfit[i]
+    })
+  }
+  process.send(returnModules)
 })
 
 function dataPreprocessing(unhandledData) {
@@ -180,12 +179,12 @@ function dataPreprocessing(unhandledData) {
       let newContent = subString + covertNumber.toString()
       content = newContent
   }
-  console.log("content: ", content)
+  // console.log("content: ", content)
   metaList.forEach(meta => {
     let Str = meta['metaInfo'].chipName
     strArr.push(Str)
   });
-  console.log("strArr: ", strArr)
+  // console.log("strArr: ", strArr)
   partitionedDataPhases.forEach(element => {
     for(let i = 0; i < element.chipDataList.length; i ++){
       let foundChipData = element.chipDataList.find((chipData)=>{
@@ -205,7 +204,7 @@ function dataPreprocessing(unhandledData) {
     resultMatrix.push(arr)
   }
   
-  console.log("resultMatrix before transformed: \n", resultMatrix)
+  // console.log("resultMatrix before transformed: \n", resultMatrix)
 
   metaList.forEach((meta, index) => {
     switch (meta.metaInfo.type) {
@@ -256,6 +255,6 @@ function dataPreprocessing(unhandledData) {
         break;
     }
   });
-  console.log("resultMatrix after transformed: ", resultMatrix)
+  // console.log("resultMatrix after transformed: ", resultMatrix)
   return { content, strArr, resultMatrix }
 }

@@ -13,58 +13,116 @@ const PORT = 3000
 let childQueue = [];
 let childNum = 0;
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
 
-app.get('/compute', (req, res) => {
-  const child = child_process.fork('./child.js');
-  
-  axios.get('http://localhost:8787/simulator')
-  .then((res)=>{
-    return res.data;
-  })
-  .catch((err)=>{
-    console.log(err);
-  })
-  .then((data)=>{
-    child.send({
-      action:'Compute',
-      data: data
-    });
-  })
-  // const Package = req.body;
-  // console.log(Package);
-  // res.send("hihi parker")
+app.post('/compute', (req, res) => {
+  // let isError = false
   // const child = child_process.fork('./child.js');
-  // child.send({ action:'Compute', data: Package })
+  
+  // axios.get('http://localhost:8787/simulator')
+  // .then((res)=>{
+  //   return res.data;
+  // })
+  // .catch((err)=>{
+  //   console.log(err);
+  // })
+  // .then((data)=>{
+  //   isError = valueChecked(data)
+    
+  //   if(!isError){
+  //     child.send({
+  //       action:'Compute',
+  //       data: data
+  //     });  
+  //     childNum += 1;
+  //     console.log(`current number of [ CHILD PROCESS ] is: ${childNum}\n`);
+  //     child.on('message', msg => {
+  //       childNum -= 1
+  //       if(childNum === -1) childNum = 0
+  //       console.log(`current number of [ CHILD PROCESS ] is: ${childNum}\n`);
+  //       childQueue.forEach(function(item, index) {
+  //         if (item === msg.id) {
+  //           childQueue.splice(index, 1);
+  //         }
+  //       });
 
-  child.on('message', msg => {
-    if( childNum === -1 ) childNum = 0
-    else childNum -= 1
+  //       res.json({
+  //         error: '',
+  //         statusCode: 200,
+  //         modules: msg.modules
+  //       })
+  //     })
+  //   }
+  //   else{
+  //     console.log("error!")
+  //     res.json({
+  //       error: '資料有null或undefined !',
+  //       statusCode: 400,
+  //       modules: null
+  //     })
+  //   }
+  // })
+
+  const Package = req.body;
+  isError = valueChecked(Package)
+
+  if(!isError){
+    const child = child_process.fork('./child.js');
+    child.send({ action:'Compute', data: Package })
+    childNum += 1
     console.log(`current number of [ CHILD PROCESS ] is: ${childNum}\n`);
-    childQueue.forEach(function(item, index) {
-      if (item === msg.id) {
-        childQueue.splice(index, 1);
-      }
-    });
-    // if(msg.modules){
-    //   res.send({
-    //     error: '資料不能為空',
-    //     statusCode: 400
-    //   })
-    // }
-    // else{
+    child.on('message', msg => {
+      childNum -= 1
+      if(childNum === -1) childNum = 0
 
-    // }
-    // console.log(msg.operation)
-    // console.log(msg.possessed)
-    // console.log(msg.funds)
-    // console.log(msg.fundsWithProfit)
-    res.send('finish')
-  })
+      console.log(`current number of [ CHILD PROCESS ] is: ${childNum}\n`);
+      childQueue.forEach(function(item, index) {
+        if (item === msg.id) {
+          childQueue.splice(index, 1);
+        }
+      });
+
+      res.json({
+        error: '',
+        statusCode: 200,
+        modules: msg.modules
+      })
+    })
+  }
+  else{
+    res.json({
+      error: '資料有null或undefined !',
+      statusCode: 400,
+      modules: null
+    })
+  }
 });
 
 app.listen(PORT, () => {
   console.log(`Server is listening at PORT ${ PORT }...`);
 });
+
+function valueChecked(obj){
+  let errOccur = false
+  obj.modules.forEach((module)=>{
+    module.partitionedDataPhases.forEach((data)=>{
+    if(data.stockPrice === undefined || data.stockPrice === null) {
+      errOccur = true
+      return
+    }
+    if(data.timeStamp === undefined || data.timeStamp === null){
+      errOccur = true
+      return
+    }
+    data.chipDataList.forEach((each)=>{
+      // console.log(each.value)
+      if(each.value === undefined || each.value === null){
+        errOccur = true
+        return
+      }
+    })
+    if(errOccur) return
+  })
+  if(errOccur) return
+})
+  return errOccur
+}
