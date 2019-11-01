@@ -40,20 +40,29 @@ app.get('/compute', (req, res) => {
   // child.send({ action:'Compute', data: Package })
 
   child.on('message', msg => {
-    childNum -= 1;
+    if( childNum === -1 ) childNum = 0
+    else childNum -= 1
     console.log(`current number of [ CHILD PROCESS ] is: ${childNum}\n`);
     childQueue.forEach(function(item, index) {
       if (item === msg.id) {
         childQueue.splice(index, 1);
       }
     });
+    // if(msg.modules){
+    //   res.send({
+    //     error: '資料不能為空',
+    //     statusCode: 400
+    //   })
+    // }
+    // else{
+
+    // }
     // console.log(msg.operation)
     // console.log(msg.possessed)
     // console.log(msg.funds)
     // console.log(msg.fundsWithProfit)
-    res.send('hello hello')
-  });
-
+    res.send('finish')
+  })
 });
 
 app.listen(PORT, () => {
